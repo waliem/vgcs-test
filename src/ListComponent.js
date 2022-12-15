@@ -1,27 +1,29 @@
-import React, { useState } from "react";
+import React from "react";
 import Draggable from "react-draggable";
 import "./App.css";
 
-const ListComponent = (props) => {
-  const [position, setPosition] = useState([{}]);
-
-  const index = props.index;
-  const onUpdateFunc = props.onUpdate;
-  const label = props.label;
-
+const ListComponent = ({ item, circles, setCircles }) => {
   // keeps track of x and y positions data and saves in the state
   const trackPositions = (data) => {
-    onUpdateFunc({ label, x: data.x, y: data.y });
-    setPosition({ x: data.x, y: data.y });
+    const filteredCircles = circles.filter(
+      (circle) => circle.label !== item.label
+    );
+
+    setCircles([
+      ...filteredCircles,
+      { x: data.x, y: data.y, label: item.label },
+    ]);
   };
 
   return (
-    <Draggable onStop={(e, data) => trackPositions(data)}>
-      <div key={index} className="Circle">
-        <div>
-          <p>{label}</p>
-        </div>
-      </div>
+    <Draggable
+      defaultPosition={
+        item === null ? { x: 0, y: 0 } : { x: item.x, y: item.y }
+      }
+      position={{ x: item.x, y: item.y }}
+      onStop={(e, data) => trackPositions(data)}
+    >
+      <div className="Circle"></div>
     </Draggable>
   );
 };

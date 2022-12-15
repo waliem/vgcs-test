@@ -5,15 +5,7 @@ import { ClearButton } from "./ClearButton.js";
 import ListComponent from "./ListComponent.js";
 
 const App = () => {
-  const [circles, setCircles] = useState([
-    {
-      label: makeid(1),
-      x: 0,
-      y: 0,
-    },
-  ]);
-
-  console.log("circles state", circles);
+  const [circles, setCircles] = useState([]);
 
   //checks if there is any previous circles stored in the local storage and if there is it sets it the state
   useEffect(() => {
@@ -23,7 +15,8 @@ const App = () => {
 
   //checks that if there is any circles it sets them in the local storage
   useEffect(() => {
-    if (circles?.length) {
+    console.log("circles", circles);
+    if (circles.length > 0) {
       localStorage.setItem("circles", JSON.stringify(circles));
     }
   }, [circles]);
@@ -39,17 +32,13 @@ const App = () => {
     setCircles([...newCircles]);
     localStorage.setItem("newCircles", JSON.stringify(newCircles));
   }
-  // this tracks and updates the specific circle with its position
-  // but it needs to be able to find the right circle AND update the circle state with the new positions of X and Y
-  const updateXYPos = (obj) => {
-    console.log(obj);
-  };
 
   //removes all circles when clicking clear button
   function clearContainer() {
     setCircles([]);
     localStorage.clear();
   }
+
   // generates a random letter for the circles. extra task to make sure that the letter does not duplicate
   function makeid(length) {
     var result = "";
@@ -69,17 +58,17 @@ const App = () => {
           <ClearButton onClick={clearContainer} text="Clear Container" />
         </div>
 
-        <div className="container">
-          {circles &&
-            circles.map((item, index) => (
-              <ListComponent
-                key={index}
-                text={item}
-                onUpdate={updateXYPos}
-                label={item.label}
-              />
-            ))}
-        </div>
+        {/* <div className="container"> */}
+        {circles &&
+          circles.map((item, index) => (
+            <ListComponent
+              key={index}
+              item={item}
+              circles={circles}
+              setCircles={setCircles}
+            />
+          ))}
+        {/* </div> */}
       </div>
     </>
   );
