@@ -9,4 +9,4 @@ const ClearButton = (props) => {
   );
 };
 
-export { ClearButton };
+export default ClearButton;

@@ -9,4 +9,4 @@ const AddButton = (props) => {
   );
 };
 
-export { AddButton };
+export default AddButton;

@@ -1,8 +1,10 @@
 import "./App.css";
+import React from "react";
 import { useState, useEffect } from "react";
-import { AddButton } from "./AddButton.js";
-import { ClearButton } from "./ClearButton.js";
-import ListComponent from "./ListComponent.js";
+import AddButton from "./AddButton.js";
+import ClearButton from "./ClearButton.js";
+import { sortableContainer, sortableElement } from "react-sortable-hoc";
+import arrayMove from "array-move";
 
 const App = () => {
   const [circles, setCircles] = useState([]);
@@ -22,16 +24,12 @@ const App = () => {
   }, [circles]);
 
   // Adds a new circle and should store it in local storage
-  function addCircle() {
+  const addCircle = () => {
     const newCircles = [...circles];
-    newCircles.push({
-      label: makeid(1),
-      x: 0,
-      y: 0,
-    });
+    newCircles.push(makeid(1));
     setCircles([...newCircles]);
     localStorage.setItem("newCircles", JSON.stringify(newCircles));
-  }
+  };
 
   //removes all circles when clicking clear button
   function clearContainer() {
@@ -39,7 +37,26 @@ const App = () => {
     localStorage.clear();
   }
 
-  // generates a random letter for the circles. extra task to make sure that the letter does not duplicate
+  //Sorts the new array when dragging is done
+  const onSortEnd = ({ oldIndex, newIndex }) => {
+    const newArr = [...circles];
+    const ordered = arrayMove(newArr, oldIndex, newIndex);
+
+    setCircles([...ordered]);
+  };
+
+  // sets the items in the array as an item
+  const SortableItem = sortableElement(({ item, index, circles = [] }) => (
+    <li className="circle" key={index}>
+      <span>{item}</span>
+    </li>
+  ));
+
+  const SortableContainer = sortableContainer(({ children }) => {
+    return <ul className="circleHolder">{children}</ul>;
+  });
+
+  // generates a random letter for the circles
   function makeid(length) {
     var result = "";
     var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -58,17 +75,14 @@ const App = () => {
           <ClearButton onClick={clearContainer} text="Clear Container" />
         </div>
 
-        {/* <div className="container"> */}
-        {circles &&
-          circles.map((item, index) => (
-            <ListComponent
-              key={index}
-              item={item}
-              circles={circles}
-              setCircles={setCircles}
-            />
-          ))}
-        {/* </div> */}
+        <div className="container">
+          <SortableContainer onSortEnd={onSortEnd} axis="yx">
+            {circles &&
+              circles.map((item, index) => (
+                <SortableItem key={"key_" + index} item={item} index={index} />
+              ))}
+          </SortableContainer>
+        </div>
       </div>
     </>
   );
